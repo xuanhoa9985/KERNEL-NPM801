@@ -66,7 +66,7 @@ static int show_cpuinfo(struct seq_file *m, void *v)
 					   mips_get_machine_name());
 		}
 		
-		seq_printf(m, "processor\t\t: %ld\n", n);
+		seq_printf(m, "processor\t\t: ARMv7 swp half thumb fastmult vfp vfpv3 %ld\n", n);
 		sprintf(fmt, "cpu model\t\t: %%s V%%d.%%d%s\n",
 			cpu_data[n].options & MIPS_CPU_FPU ? "  FPU V%d.%d" : "");
 		seq_printf(m, fmt, __cpu_name[n],
@@ -76,8 +76,6 @@ static int show_cpuinfo(struct seq_file *m, void *v)
 			   cpu_data[n].udelay_val / (500000/HZ),
 			   (cpu_data[n].udelay_val / (5000/HZ)) % 100);
 		seq_printf(m, "wait instruction\t: %s\n", cpu_wait ? "yes" : "no");
-		seq_printf(m, "microsecond timers\t: %s\n",
-			   cpu_has_counter ? "yes" : "no");
 		seq_printf(m, "tlb_entries\t\t: %d\n", cpu_data[n].tlbsize);
 		seq_printf(m, "extra interrupt vector\t: %s\n",
 			   cpu_has_divec ? "yes" : "no");
