@@ -59,14 +59,24 @@ static int show_cpuinfo(struct seq_file *m, void *v)
 		/*
 		 * For the first processor also print the system type
 		 */
+		unsigned int detected = 0;
+		rcu_read_lock();
+		if ((strcmp(current->parent->comm, "tv.apad:vplayer") == 0) ||
+			(strcmp(current->comm, "tv.apad:vplayer") == 0)) {
+			detected = 1;
+		}
+		rcu_read_unlock();
 		if (n == 0) {
 			seq_printf(m, "system type\t\t: %s\n", get_system_type());
 			if (mips_get_machine_name())
 				seq_printf(m, "machine\t\t\t: %s\n",
 					   mips_get_machine_name());
 		}
-		
-		seq_printf(m, "processor\t\t: ARMv7 swp half thumb fastmult vfp vfpv3 %ld\n", n);
+		if (detected == 0) {
+			seq_printf(m, "processor\t\t: %ld\n", n);
+		} else {
+			seq_printf(m, "processor\t\t: ARMv7 swp half thumb fastmult vfp edsp neon vfpv3 %ld\n ", n);
+		}
 		sprintf(fmt, "cpu model\t\t: %%s V%%d.%%d%s\n",
 			cpu_data[n].options & MIPS_CPU_FPU ? "  FPU V%d.%d" : "");
 		seq_printf(m, fmt, __cpu_name[n],
@@ -76,6 +86,10 @@ static int show_cpuinfo(struct seq_file *m, void *v)
 			   cpu_data[n].udelay_val / (500000/HZ),
 			   (cpu_data[n].udelay_val / (5000/HZ)) % 100);
 		seq_printf(m, "wait instruction\t: %s\n", cpu_wait ? "yes" : "no");
+		if (detected == 0) {
+			seq_printf(m, "microsecond timers\t: %s\n",
+						cpu_has_counter ? "yes" : "no");
+		}
 		seq_printf(m, "tlb_entries\t\t: %d\n", cpu_data[n].tlbsize);
 		seq_printf(m, "extra interrupt vector\t: %s\n",
 			   cpu_has_divec ? "yes" : "no");
